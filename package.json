@@ -1,0 +1,25 @@
+{
+  "name": "affiliate-marketing-support",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "docker-compose -f ./api/mongo.yml up -d && concurrently \"npm --prefix ./api/ run dev\" \"npm --prefix ./app/ run serve -- --port=5000\""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vuchuc789/affiliate-marketing-support.git"
+  },
+  "keywords": [
+    "affiliate"
+  ],
+  "author": "Vu Chuc",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/vuchuc789/affiliate-marketing-support/issues"
+  },
+  "homepage": "https://github.com/vuchuc789/affiliate-marketing-support#readme",
+  "devDependencies": {
+    "concurrently": "^6.0.2"
+  }
+}
