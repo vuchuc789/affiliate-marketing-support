@@ -41,6 +41,10 @@
       "parser": "babel-eslint"
     },
     "rules": {
+      "indent": [
+        "warn",
+        2
+      ],
       "no-console": "warn",
       "prettier/prettier": "error"
     }

@@ -13,6 +13,12 @@ const routes = [
     name: 'Login',
     component: Login,
   },
+  {
+    path: '/register',
+    name: 'Register',
+    component: Login,
+    props: { register: true },
+  },
 ];
 
 const router = createRouter({

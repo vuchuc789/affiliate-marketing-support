@@ -1,0 +1,3 @@
+{
+  "include": ["./app/src/**/*", "./api/src/**/*", "./api/server.js"]
+}

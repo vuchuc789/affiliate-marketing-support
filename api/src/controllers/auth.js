@@ -67,7 +67,7 @@ const login = async (req, res) => {
     return;
   }
 
-  if (!bcrypt.compare(password, doc.password)) {
+  if (!(await bcrypt.compare(password, doc.password))) {
     res.status(400).json({ error: 'Wrong password' });
     return;
   }
