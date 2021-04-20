@@ -1,5 +1,5 @@
 <template>
-  <div>{{ error }}</div>
+  <div :style="{ display: isEmpty ? 'none' : 'block' }">{{ error }}</div>
 </template>
 
 <script>
@@ -16,6 +16,9 @@ export default {
   computed: {
     error() {
       return this.$store.state.error;
+    },
+    isEmpty() {
+      return this.$store.state.error === '';
     },
   },
   watch: {
@@ -48,6 +51,11 @@ div {
   position: fixed;
   bottom: 0.5rem;
   left: 0.5rem;
-  background-color: red;
+  background-color: #e22a2a;
+  color: #fff;
+  padding: 0.5rem;
+  min-width: 10rem;
+  text-align: center;
+  border-radius: 0.5rem;
 }
 </style>
