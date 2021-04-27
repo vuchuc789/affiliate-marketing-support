@@ -38,7 +38,7 @@ export default {
     goTo(link) {
       if (link === '/logout') {
         this.$store.commit(CLEAR_USER_ID);
-        this.hideDrop();
+        this.showed = false;
 
         return;
       }
