@@ -20,6 +20,6 @@
   },
   "homepage": "https://github.com/vuchuc789/affiliate-marketing-support#readme",
   "devDependencies": {
-    "concurrently": "^6.0.2"
+    "concurrently": "^6.1.0"
   }
 }

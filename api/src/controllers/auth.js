@@ -1,85 +1,110 @@
-const bcrypt = require('bcrypt');
+const passport = require('passport');
 const jwt = require('jsonwebtoken');
 
 require('dotenv').config();
 
-const usernameRegex = /^(?!_+)[a-zA-Z0-9_]{4,20}(?<!_+)$/;
-const passwordRegex = /^.{6,20}$/;
-const salt = 12;
 const jwtSecret = process.env.JWT_KEY;
-const tokenAge = 60 * 60;
+// 120 minutes
+const accessTokenAge = 120 * 60;
 
 const User = require('../models/user');
 
 // create new user, return tokens
-const register = async (req, res) => {
-  try {
-    const { username, password } = req.body;
-
-    if (typeof username !== 'string' || typeof password !== 'string') {
-      res.status(400).json({ error: 'Missing username or password' });
+const register = (req, res, next) => {
+  passport.authenticate('signup', { session: false }, (err, user, info) => {
+    if (err || !user) {
+      res.json(info);
       return;
     }
 
-    if (!usernameRegex.test(username)) {
-      res.status(400).json({ error: 'Invalid username' });
-      return;
-    }
-
-    if (!passwordRegex.test(password)) {
-      res.status(400).json({ error: 'Invalid password' });
-      return;
-    }
-
-    if (await User.exists({ username })) {
-      res.status(400).json({ error: 'Username is existed' });
-      return;
-    }
-
-    const hashedPassword = await bcrypt.hash(password, salt);
-
-    const user = new User({
-      username,
-      password: hashedPassword,
+    res.json({
+      ...info,
+      user_id: user._id,
+      email: user.email,
     });
-
-    const savedDoc = await user.save();
-
-    res.json({ id: savedDoc._id, username: savedDoc.username });
-  } catch (e) {
-    res.status(400).json({ error: e.message });
-  }
+  })(req, res, next);
 };
 
 // get tokens by password
-const login = async (req, res) => {
-  const { username, password } = req.body;
+const login = (req, res, next) => {
+  passport.authenticate(
+    'login',
+    { session: false },
+    async (err, user, info) => {
+      if (err || !user) {
+        res.json(info);
+        return;
+      }
 
-  if (typeof username !== 'string' || typeof password !== 'string') {
-    res.status(400).json({ error: 'Missing username or password' });
-    return;
-  }
+      const tokenPayload = {
+        id: user._id,
+        email: user.email,
+      };
 
-  const doc = await User.findOne({ username });
+      const accessToken = jwt.sign(tokenPayload, jwtSecret, {
+        expiresIn: accessTokenAge,
+      });
+      const refreshToken = jwt.sign(tokenPayload, jwtSecret);
 
-  if (!doc) {
-    res.status(404).json({ error: 'User not found' });
-    return;
-  }
+      user.refreshToken = refreshToken;
+      await user.save();
 
-  if (!(await bcrypt.compare(password, doc.password))) {
-    res.status(400).json({ error: 'Wrong password' });
-    return;
-  }
+      res.json({
+        access_token: accessToken,
+        refresh_token: refreshToken,
+      });
+    }
+  )(req, res, next);
+};
 
-  const token = jwt.sign({ id: doc._id }, jwtSecret, {
-    expiresIn: tokenAge,
-  });
+const getNewToken = (req, res, next) => {
+  passport.authenticate(
+    'refresh_token',
+    { session: false },
+    (err, user, info) => {
+      if (err || !user) {
+        res.json(info);
+        return;
+      }
 
-  res.json({ id: doc._id, token });
+      const tokenPayload = {
+        id: user._id,
+        email: user.email,
+      };
+
+      const accessToken = jwt.sign(tokenPayload, jwtSecret, {
+        expiresIn: accessTokenAge,
+      });
+
+      res.json({ access_token: accessToken });
+    }
+  )(req, res, next);
+};
+
+const logout = (req, res, next) => {
+  passport.authenticate('jwt', { session: false }, async (err, token, info) => {
+    if (err || !token) {
+      res.json(info);
+      return;
+    }
+
+    const user = await User.findById(token.id);
+
+    if (!user) {
+      res.json({ error: 'User not found' });
+      return;
+    }
+
+    user.refreshToken = '';
+    await user.save();
+
+    res.json({ message: 'You are logged out' });
+  })(req, res, next);
 };
 
 module.exports = {
   register,
   login,
+  getNewToken,
+  logout,
 };

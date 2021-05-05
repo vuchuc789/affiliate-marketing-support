@@ -4,7 +4,7 @@ const cors = require('cors');
 
 const router = require('./src/routes');
 
-require("dotenv").config();
+require('dotenv').config();
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -42,6 +42,9 @@ app.use((error, req, res, next) => {
 
   next();
 });
+
+// passport
+require('./src/helpers/auth');
 
 // router
 app.use('/api', router.api);

@@ -1,0 +1,29 @@
+### Register
+POST http://localhost:3000/api/auth/register HTTP/1.1
+Content-Type: application/json
+
+{
+  "email": "abcd@abc.abc",
+  "password": "abc123"
+}
+
+### Login
+POST http://localhost:3000/api/auth/login HTTP/1.1
+Content-Type: application/json
+
+{
+  "email": "abcd@abc.abc",
+  "password": "abc123"
+}
+
+### Refresh token
+POST http://localhost:3000/api/auth/refresh HTTP/1.1
+Content-Type: application/json
+
+{
+  "refresh_token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwOWRlMzkzMTgzOGUzMGUxYjJmOGYyYiIsImVtYWlsIjoiYWJjZEBhYmMuYWJjIiwiaWF0IjoxNjIwOTYwMTYwfQ.VlaPXA1QmwyxD9yR_hji48i1GcROEAREtLks-XpshtA"
+}
+
+### Logout
+GET http://localhost:3000/api/auth/logout HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwOWRlMzkzMTgzOGUzMGUxYjJmOGYyYiIsImVtYWlsIjoiYWJjZEBhYmMuYWJjIiwiaWF0IjoxNjIwOTYwMjM4LCJleHAiOjE2MjA5Njc0Mzh9.5gr1IPvw0KBvWyek35tRClZ3qNTd08gVYhQHPp-HpWc
