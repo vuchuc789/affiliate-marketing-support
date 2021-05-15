@@ -3,6 +3,8 @@ const LocalStrategy = require('passport-local');
 const JWTStrategy = require('passport-jwt').Strategy;
 const ExtractJWT = require('passport-jwt').ExtractJwt;
 const RefreshTokenStrategy = require('passport-refresh-token');
+const FacebookTokenStrategy = require('passport-facebook-token');
+const GoogleTokenStrategy = require('passport-google-verify-token').Strategy;
 const User = require('../models/user');
 
 // require('dotenv').config();
@@ -10,6 +12,9 @@ const User = require('../models/user');
 const emailRegex = /^\S+@\S+\.\S+$/;
 const passwordRegex = /^.{6,20}$/;
 const jwtSecret = process.env.JWT_KEY || 'secret';
+const facebookAppId = process.env.FACEBOOK_APP_ID;
+const facebookAppSecret = process.env.FACEBOOK_APP_SECRET;
+const googleAppId = process.env.GOOGLE_APP_ID;
 
 passport.use(
   'signup',
@@ -45,7 +50,7 @@ passport.use(
         const newUser = new User({ email, password });
         await newUser.save();
 
-        done(null, newUser, { message: 'Registered successfully' });
+        done(null, newUser);
       } catch (error) {
         done(error, false, { error: 'Something went wrong' });
       }
@@ -81,7 +86,7 @@ passport.use(
           return;
         }
 
-        done(null, user, { message: 'Login successfully' });
+        done(null, user);
       } catch (error) {
         done(error, false, { error: 'Something went wrong' });
       }
@@ -121,4 +126,52 @@ passport.use(
       done(error, false, { error: 'Something went wrong' });
     }
   })
+);
+
+passport.use(
+  new FacebookTokenStrategy(
+    {
+      clientID: facebookAppId,
+      clientSecret: facebookAppSecret,
+      fbGraphVersion: 'v10.0',
+    },
+    async (accessToken, refreshToken, profile, done) => {
+      try {
+        const { email } = profile;
+        let user = await User.findOne({ email });
+
+        if (!user) {
+          user = new User({ email, password: '' });
+          await user.save();
+        }
+
+        done(null, user);
+      } catch (error) {
+        done(error, false, { error: 'Something went wrong' });
+      }
+    }
+  )
+);
+
+passport.use(
+  new GoogleTokenStrategy(
+    {
+      clientID: googleAppId,
+    },
+    async (parsedToken, googleId, done) => {
+      try {
+        const { email } = parsedToken;
+        let user = await User.findOne({ email });
+
+        if (!user) {
+          user = new User({ email, password: '' });
+          await user.save();
+        }
+
+        done(null, user);
+      } catch (error) {
+        done(error, false, { error: 'Something went wrong' });
+      }
+    }
+  )
 );
