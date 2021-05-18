@@ -1,3 +1,10 @@
 {
-  "include": ["./app/src/**/*", "./api/src/**/*", "./api/server.js"]
+  "include": [
+    "./app/src/**/*",
+    "./api/src/**/*",
+    "./api/server.js"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
 }

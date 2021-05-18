@@ -27,23 +27,23 @@ passport.use(
       try {
         if (!email || !passport) {
           done(null, false, {
-            error: 'Email or password is required',
+            message: 'Email or password is required',
           });
           return;
         }
 
         if (!emailRegex.test(email)) {
-          done(null, false, { error: 'Invalid email' });
+          done(null, false, { message: 'Invalid email' });
           return;
         }
 
         if (!passwordRegex.test(password)) {
-          done(null, false, { error: 'Invalid password' });
+          done(null, false, { message: 'Invalid password' });
           return;
         }
 
         if (await User.exists({ email })) {
-          done(null, false, { error: 'User is already existed' });
+          done(null, false, { message: 'User is already existed' });
           return;
         }
 
@@ -52,7 +52,7 @@ passport.use(
 
         done(null, newUser);
       } catch (error) {
-        done(error, false, { error: 'Something went wrong' });
+        done(error, false, { message: 'Something went wrong' });
       }
     }
   )
@@ -69,7 +69,7 @@ passport.use(
       try {
         if (!email || !password) {
           done(null, false, {
-            error: 'Email and password is required',
+            message: 'Email and password is required',
           });
           return;
         }
@@ -77,18 +77,18 @@ passport.use(
         const user = await User.findOne({ email });
 
         if (!user) {
-          done(null, false, { error: 'User not found' });
+          done(null, false, { message: 'User not found' });
           return;
         }
 
         if (!(await user.verifyPassword(password))) {
-          done(null, false, { error: 'Wrong password' });
+          done(null, false, { message: 'Wrong password' });
           return;
         }
 
         done(null, user);
       } catch (error) {
-        done(error, false, { error: 'Something went wrong' });
+        done(error, false, { message: 'Something went wrong' });
       }
     }
   )
@@ -103,7 +103,7 @@ passport.use(
     },
     (token, done) => {
       if (!token) {
-        done(null, false, { error: 'Bearer token is required' });
+        done(null, false, { message: 'Bearer token is required' });
       }
 
       done(null, token);
@@ -117,13 +117,13 @@ passport.use(
       const user = await User.findOne({ refreshToken: token });
 
       if (!user) {
-        done(null, false, { error: 'Token not found' });
+        done(null, false, { message: 'Token not found' });
         return;
       }
 
       done(null, user);
     } catch (error) {
-      done(error, false, { error: 'Something went wrong' });
+      done(error, false, { message: 'Something went wrong' });
     }
   })
 );
@@ -147,7 +147,7 @@ passport.use(
 
         done(null, user);
       } catch (error) {
-        done(error, false, { error: 'Something went wrong' });
+        done(error, false, { message: 'Something went wrong' });
       }
     }
   )
@@ -170,7 +170,7 @@ passport.use(
 
         done(null, user);
       } catch (error) {
-        done(error, false, { error: 'Something went wrong' });
+        done(error, false, { message: 'Something went wrong' });
       }
     }
   )

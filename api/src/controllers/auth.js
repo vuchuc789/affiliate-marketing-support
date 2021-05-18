@@ -9,6 +9,31 @@ const accessTokenAge = 120 * 60;
 
 const User = require('../models/user');
 
+const getTokens = async (user) => {
+  if (!(user instanceof User)) {
+    return;
+  }
+  let { _id, email, refreshToken } = user;
+
+  const tokenPayload = {
+    id: _id,
+    email,
+    rand: Math.round(Math.random() * 100000),
+  };
+
+  const accessToken = jwt.sign(tokenPayload, jwtSecret, {
+    expiresIn: accessTokenAge,
+  });
+
+  if (!refreshToken) {
+    refreshToken = jwt.sign(tokenPayload, jwtSecret);
+    user.refreshToken = refreshToken;
+    await user.save();
+  }
+
+  return { accessToken, refreshToken };
+};
+
 // create new user, return tokens
 const register = (req, res, next) => {
   passport.authenticate('signup', { session: false }, (err, user, info) => {
@@ -24,13 +49,13 @@ const register = (req, res, next) => {
         email: user.email,
       });
     } catch (error) {
-      res.json({ error: 'Something went wrong' });
+      res.json({ message: 'Something went wrong' });
     }
   })(req, res, next);
 };
 
 // get tokens by password
-const login = (req, res, next) => {
+const login = async (req, res, next) => {
   passport.authenticate(
     'login',
     { session: false },
@@ -41,18 +66,7 @@ const login = (req, res, next) => {
           return;
         }
 
-        const tokenPayload = {
-          id: user._id,
-          email: user.email,
-        };
-
-        const accessToken = jwt.sign(tokenPayload, jwtSecret, {
-          expiresIn: accessTokenAge,
-        });
-        const refreshToken = jwt.sign(tokenPayload, jwtSecret);
-
-        user.refreshToken = refreshToken;
-        await user.save();
+        const { accessToken, refreshToken } = await getTokens(user);
 
         res.json({
           message: 'Login successfully',
@@ -60,7 +74,7 @@ const login = (req, res, next) => {
           refresh_token: refreshToken,
         });
       } catch (error) {
-        res.json({ error: 'Something went wrong' });
+        res.json({ message: 'Something went wrong' });
       }
     }
   )(req, res, next);
@@ -70,28 +84,21 @@ const getNewToken = (req, res, next) => {
   passport.authenticate(
     'refresh_token',
     { session: false },
-    (err, user, info) => {
+    async (err, user, info) => {
       try {
         if (err || !user) {
           res.json(info);
           return;
         }
 
-        const tokenPayload = {
-          id: user._id,
-          email: user.email,
-        };
-
-        const accessToken = jwt.sign(tokenPayload, jwtSecret, {
-          expiresIn: accessTokenAge,
-        });
+        const { accessToken } = await getTokens(user);
 
         res.json({
           message: 'New token was generated',
           access_token: accessToken,
         });
       } catch (error) {
-        res.json({ error: 'Something went wrong' });
+        res.json({ message: 'Something went wrong' });
       }
     }
   )(req, res, next);
@@ -108,7 +115,7 @@ const logout = (req, res, next) => {
       const user = await User.findById(token.id);
 
       if (!user) {
-        res.json({ error: 'User not found' });
+        res.json({ message: 'User not found' });
         return;
       }
 
@@ -117,7 +124,7 @@ const logout = (req, res, next) => {
 
       res.json({ message: 'You are logged out' });
     } catch (error) {
-      res.json({ error: 'Something went wrong' });
+      res.json({ message: 'Something went wrong' });
     }
   })(req, res, next);
 };
@@ -133,18 +140,7 @@ const facebookAuth = (req, res) => {
           return;
         }
 
-        const tokenPayload = {
-          id: user._id,
-          email: user.email,
-        };
-
-        const accessToken = jwt.sign(tokenPayload, jwtSecret, {
-          expiresIn: accessTokenAge,
-        });
-        const refreshToken = jwt.sign(tokenPayload, jwtSecret);
-
-        user.refreshToken = refreshToken;
-        await user.save();
+        const { refreshToken, accessToken } = await getTokens(user);
 
         res.json({
           message: 'Login successfully',
@@ -152,7 +148,7 @@ const facebookAuth = (req, res) => {
           refresh_token: refreshToken,
         });
       } catch (error) {
-        res.json('Something went wrong');
+        res.json({ message: 'Something went wrong' });
       }
     }
   )(req, res);
@@ -169,18 +165,7 @@ const googleAuth = (req, res) => {
           return;
         }
 
-        const tokenPayload = {
-          id: user._id,
-          email: user.email,
-        };
-
-        const accessToken = jwt.sign(tokenPayload, jwtSecret, {
-          expiresIn: accessTokenAge,
-        });
-        const refreshToken = jwt.sign(tokenPayload, jwtSecret);
-
-        user.refreshToken = refreshToken;
-        await user.save();
+        const { refreshToken, accessToken } = getTokens(user);
 
         res.json({
           message: 'Login successfully',
@@ -188,7 +173,7 @@ const googleAuth = (req, res) => {
           refresh_token: refreshToken,
         });
       } catch (error) {
-        res.json({ error: 'Something went wrong' });
+        res.json({ message: 'Something went wrong' });
       }
     }
   )(req, res);

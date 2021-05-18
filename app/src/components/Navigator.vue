@@ -11,7 +11,7 @@
 </template>
 
 <script>
-import { CLEAR_USER_ID } from '../store/mutation-types';
+import { LOGOUT } from '../store/action-types';
 
 export default {
   name: 'Navigator',
@@ -22,13 +22,13 @@ export default {
     };
   },
   computed: {
-    isLoggedIn() {
-      return this.$store.getters.isLoggedIn();
+    isAuthenticated() {
+      return this.$store.getters.isAuthenticated();
     },
   },
   watch: {
-    isLoggedIn(loggedIn) {
-      this.setItems(loggedIn);
+    isAuthenticated(authenticated) {
+      this.setItems(authenticated);
     },
   },
   methods: {
@@ -37,29 +37,30 @@ export default {
     },
     goTo(link) {
       if (link === '/logout') {
-        this.$store.commit(CLEAR_USER_ID);
-        this.showed = false;
-
-        return;
+        this.$store.dispatch(LOGOUT, {
+          callback: () => {
+            this.$router.push('/');
+          },
+        });
+      } else {
+        this.$router.push(link);
       }
 
-      this.$router.push(link);
       this.showed = false;
     },
-    setItems(loggedIn) {
-      if (!loggedIn) {
+    setItems(authenticated) {
+      if (!authenticated) {
         this.items = [
           { title: 'login', url: '/login' },
           { title: 'register', url: '/register' },
         ];
-        return;
+      } else {
+        this.items = [{ title: 'logout', url: '/logout' }];
       }
-
-      this.items = [{ title: 'logout', url: '/logout' }];
     },
   },
-  beforeMount() {
-    this.setItems(this.isLoggedIn);
+  created() {
+    this.setItems(this.isAuthenticated);
   },
 };
 </script>

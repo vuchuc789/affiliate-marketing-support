@@ -24,12 +24,12 @@ import 'grapesjs/dist/css/grapes.min.css';
 import grapesjs from 'grapesjs';
 
 export default {
-  data() {
+  data: function () {
     return {
       editor: null,
     };
   },
-  mounted() {
+  mounted: function () {
     this.editor = grapesjs.init({
       container: '#gjs',
       fromElement: true,

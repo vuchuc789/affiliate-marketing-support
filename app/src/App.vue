@@ -1,16 +1,20 @@
 <template>
-  <Navigator />
+  <navigator />
   <router-view :key="$route.fullPath" class="container"></router-view>
-  <Error />
+  <notification />
 </template>
 
 <script>
 import Navigator from './components/Navigator.vue';
-import Error from './components/Error.vue';
+import Notification from './components/Notification.vue';
+import { GET_FROM_LOCAL_STORAGE } from './store/action-types';
 
 export default {
   name: 'App',
-  components: { Navigator, Error },
+  components: { Navigator, Notification },
+  mounted: function () {
+    this.$store.dispatch(GET_FROM_LOCAL_STORAGE, { callback: () => {} });
+  },
 };
 </script>
 
