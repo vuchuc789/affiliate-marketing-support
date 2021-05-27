@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "docker-compose -f ./api/mongo.yml up -d && concurrently \"npm --prefix ./api/ run dev\" \"npm --prefix ./app/ run serve -- --port=5000\""
+    "dev": "docker-compose -f ./api/mongo.yml up -d && concurrently \"yarn --cwd ./api/ dev\" \"PORT=5000 yarn --cwd ./app/ serve\""
   },
   "repository": {
     "type": "git",
@@ -20,6 +20,6 @@
   },
   "homepage": "https://github.com/vuchuc789/affiliate-marketing-support#readme",
   "devDependencies": {
-    "concurrently": "^6.1.0"
+    "concurrently": "^6.2.0"
   }
 }
