@@ -1,4 +1,5 @@
 <template>
+  <navigator />
   <div class="container">
     <form @keyup.enter="submit">
       <label for="email">email</label>
@@ -20,13 +21,17 @@
       </div>
     </form>
   </div>
+  <notification />
 </template>
 
 <script>
 import { LOGIN, REGISTER } from '../store/action-types';
+import Navigator from '../components/Navigator.vue';
+import Notification from '../components/Notification.vue';
 
 export default {
   name: 'Auth',
+  components: { Navigator, Notification },
   props: {
     type: {
       type: String,
@@ -40,6 +45,18 @@ export default {
       rePassword: '',
       formType: this.type,
     };
+  },
+  computed: {
+    isAuthenticated: function () {
+      return this.$store.getters.isAuthenticated();
+    },
+  },
+  watch: {
+    isAuthenticated: function (newState) {
+      if (newState) {
+        this.$router.push('/');
+      }
+    },
   },
   methods: {
     submit: function () {

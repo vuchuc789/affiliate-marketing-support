@@ -1,8 +1,10 @@
 import {
-  AUTHENTICATING,
+  SET_AUTHENTICATING,
   SET_ACCESS_TOKEN,
   SET_REFRESH_INTERVAL_ID,
   SET_REFRESH_TOKEN,
+  ADD_TO_DROPDOWN,
+  REMOVE_FROM_DROPDOWN,
 } from './mutation-types';
 import {
   GET_FROM_LOCAL_STORAGE,
@@ -15,6 +17,7 @@ import {
   REGISTER,
 } from './action-types';
 import { register, login, refreshAccessToken } from '../api/auth';
+import { dropDownItems } from './navigation';
 
 const refreshFailureTimeout = 60 * 1000;
 const refreshTokenInterval = 60 * 60 * 1000;
@@ -59,31 +62,52 @@ const authModule = {
 
       state.refreshIntervalId = id;
     },
-    [AUTHENTICATING]: (state, { isAuthenticating = true }) => {
+    [SET_AUTHENTICATING]: (state, { isAuthenticating }) => {
       state.isAuthenticating = isAuthenticating;
     },
   },
   actions: {
-    [GET_FROM_LOCAL_STORAGE]: ({ dispatch, commit }, { callback }) => {
+    [GET_FROM_LOCAL_STORAGE]: ({ dispatch, commit }, { callback } = {}) => {
       if (!window.localStorage) {
         return;
       }
 
+      commit(SET_AUTHENTICATING, { isAuthenticating: true });
+
       const refreshToken = window.localStorage.getItem('refresh_token');
 
       if (!refreshToken) {
+        commit(SET_AUTHENTICATING, { isAuthenticating: false });
+
         return;
       }
 
       commit(SET_REFRESH_TOKEN, { refreshToken });
       dispatch(REFRESH_TOKEN, { callback });
       dispatch(PERIODICALLY_REFRESH_TOKEN);
+
+      commit(SET_AUTHENTICATING, { isAuthenticating: false });
+
+      commit(REMOVE_FROM_DROPDOWN, {
+        keys: [dropDownItems.login.key, dropDownItems.register.key],
+      });
+      commit(ADD_TO_DROPDOWN, { items: [{ key: dropDownItems.logout.key }] });
     },
     [REGISTER]: async (
-      { dispatch },
+      { commit, dispatch, state },
       { email, password, rePassword, callback }
     ) => {
       try {
+        if (state.isAuthenticating) {
+          dispatch(POP_UP_ERROR, {
+            error: 'You are in another authenticating process',
+          });
+
+          return;
+        }
+
+        commit(SET_AUTHENTICATING, { isAuthenticating: true });
+
         if (
           typeof email !== 'string' ||
           typeof password !== 'string' ||
@@ -109,6 +133,7 @@ const authModule = {
           callback();
         }
 
+        commit(SET_AUTHENTICATING, { isAuthenticating: false });
         dispatch(POP_UP_MESSAGE, {
           message: message || 'Register successfully',
         });
@@ -116,8 +141,21 @@ const authModule = {
         dispatch(POP_UP_ERROR, { error: error.message });
       }
     },
-    [LOGIN]: async ({ dispatch, commit }, { email, password, callback }) => {
+    [LOGIN]: async (
+      { dispatch, commit, state },
+      { email, password, callback }
+    ) => {
       try {
+        if (state.isAuthenticating) {
+          dispatch(POP_UP_ERROR, {
+            error: 'You are in another authenticating process',
+          });
+
+          return;
+        }
+
+        commit(SET_AUTHENTICATING, { isAuthenticating: true });
+
         if (typeof email !== 'string' || typeof password !== 'string') {
           dispatch(POP_UP_ERROR, { error: 'Wrong input type' });
           return;
@@ -142,12 +180,18 @@ const authModule = {
           callback();
         }
 
+        commit(SET_AUTHENTICATING, { isAuthenticating: false });
         dispatch(POP_UP_MESSAGE, { message: message || 'Login successfully' });
+
+        commit(REMOVE_FROM_DROPDOWN, {
+          keys: [dropDownItems.login.key, dropDownItems.register.key],
+        });
+        commit(ADD_TO_DROPDOWN, { items: [{ key: dropDownItems.logout.key }] });
       } catch (error) {
         dispatch(POP_UP_ERROR, { error: error.message });
       }
     },
-    [REFRESH_TOKEN]: async ({ dispatch, commit, state }, { callback }) => {
+    [REFRESH_TOKEN]: async ({ dispatch, commit, state }, { callback } = {}) => {
       if (!state.refreshToken) {
         setTimeout(() => {
           dispatch(REFRESH_TOKEN, { callback });
@@ -181,13 +225,22 @@ const authModule = {
 
       commit(SET_REFRESH_INTERVAL_ID, { id: intervalId });
     },
-    [LOGOUT]: ({ dispatch, commit }, { callback }) => {
+    [LOGOUT]: ({ dispatch, commit }, { callback } = {}) => {
       commit(SET_ACCESS_TOKEN, { accessToken: '' });
       commit(SET_REFRESH_TOKEN, { refreshToken: '' });
       commit(SET_REFRESH_INTERVAL_ID, { id: 0 });
 
-      dispatch(POP_UP_MESSAGE, 'Logout successfully');
+      dispatch(POP_UP_MESSAGE, { message: 'Logout successfully' });
 
+      commit(REMOVE_FROM_DROPDOWN, {
+        keys: [dropDownItems.logout.key],
+      });
+      commit(ADD_TO_DROPDOWN, {
+        items: [
+          { key: dropDownItems.login.key },
+          { key: dropDownItems.register.key },
+        ],
+      });
       if (typeof callback === 'function') {
         callback();
       }

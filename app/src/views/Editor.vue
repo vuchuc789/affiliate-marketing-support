@@ -1,5 +1,6 @@
 <template>
-  <div id="editor">
+  <navigator />
+  <div id="editor" class="container">
     <div class="panel__top">
       <div class="panel__basic-actions"></div>
       <div class="panel__devices"></div>
@@ -17,13 +18,18 @@
     </div>
     <div id="blocks"></div>
   </div>
+  <notification />
 </template>
 
 <script>
 import 'grapesjs/dist/css/grapes.min.css';
+import Navigator from '../components/Navigator.vue';
+import Notification from '../components/Notification.vue';
 import grapesjs from 'grapesjs';
 
 export default {
+  name: 'Editor',
+  components: { Navigator, Notification },
   data: function () {
     return {
       editor: null,

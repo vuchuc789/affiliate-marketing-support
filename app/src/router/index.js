@@ -4,6 +4,7 @@ import Auth from '../views/Auth.vue';
 import Editor from '../views/Editor.vue';
 
 import store from '../store/index';
+import { SET_SHOWED_DROPDOWN } from '../store/mutation-types';
 
 const routes = [
   {
@@ -50,6 +51,8 @@ router.beforeEach((to, from, next) => {
       return;
     }
   }
+
+  store.commit(SET_SHOWED_DROPDOWN, { isShowed: false });
 
   next();
 });

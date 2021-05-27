@@ -1,66 +1,32 @@
 <template>
   <div class="navbar">
     <router-link to="/" class="nav-logo">Logo</router-link>
-    <a class="drop-btn" @click="hideDrop"></a>
-    <div class="drop-menu" :class="{ 'drop-hide': !showed }">
-      <a v-for="{ title, url } in items" :key="{ title }" @click="goTo(url)">{{
-        title
-      }}</a>
+    <a class="drop-btn" @click="onDropdownButtonClick"></a>
+    <div class="drop-menu" :class="{ 'drop-hide': !isShowed }">
+      <a
+        v-for="{ key, title, callback } in dropdownMenu"
+        :key="{ key }"
+        @click="callback"
+        >{{ title }}</a
+      >
     </div>
   </div>
 </template>
 
 <script>
-import { LOGOUT } from '../store/action-types';
+import { mapState } from 'vuex';
+import { SET_SHOWED_DROPDOWN } from '../store/mutation-types';
 
 export default {
   name: 'Navigator',
-  data() {
-    return {
-      showed: false,
-      items: [],
-    };
-  },
-  computed: {
-    isAuthenticated() {
-      return this.$store.getters.isAuthenticated();
-    },
-  },
-  watch: {
-    isAuthenticated(authenticated) {
-      this.setItems(authenticated);
-    },
-  },
+  computed: mapState({
+    isShowed: (state) => state.navigation.isShowed,
+    dropdownMenu: (state) => state.navigation.dropdownMenu,
+  }),
   methods: {
-    hideDrop() {
-      this.showed = !this.showed;
+    onDropdownButtonClick: function () {
+      this.$store.commit(SET_SHOWED_DROPDOWN, { isShowed: !this.isShowed });
     },
-    goTo(link) {
-      if (link === '/logout') {
-        this.$store.dispatch(LOGOUT, {
-          callback: () => {
-            this.$router.push('/');
-          },
-        });
-      } else {
-        this.$router.push(link);
-      }
-
-      this.showed = false;
-    },
-    setItems(authenticated) {
-      if (!authenticated) {
-        this.items = [
-          { title: 'login', url: '/login' },
-          { title: 'register', url: '/register' },
-        ];
-      } else {
-        this.items = [{ title: 'logout', url: '/logout' }];
-      }
-    },
-  },
-  created() {
-    this.setItems(this.isAuthenticated);
   },
 };
 </script>
