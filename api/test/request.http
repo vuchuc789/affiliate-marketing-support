@@ -27,3 +27,20 @@ Content-Type: application/json
 ### Logout
 GET http://localhost:3000/api/auth/logout HTTP/1.1
 Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwOWRlMzkzMTgzOGUzMGUxYjJmOGYyYiIsImVtYWlsIjoiYWJjZEBhYmMuYWJjIiwiaWF0IjoxNjIwOTYwMjM4LCJleHAiOjE2MjA5Njc0Mzh9.5gr1IPvw0KBvWyek35tRClZ3qNTd08gVYhQHPp-HpWc
+
+### Load page
+GET http://localhost:3000/api/page/load HTTP/1.1
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwYjI2ZjNmMDQwMGQ3MTZhYWI0OTdmMyIsImVtYWlsIjoiYWJjZEBhYmMuYWJjIiwicmFuZCI6OTgyMjcsImlhdCI6MTYyMjMwNjYyOSwiZXhwIjoxNjIyMzEzODI5fQ.DCMiFHkBG31_vLx4JGLwxuHs3GdCHa48xd_zVJ7WJQU
+
+### Store page
+POST http://localhost:3000/api/page/store HTTP/1.1
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjYwYjI2ZjNmMDQwMGQ3MTZhYWI0OTdmMyIsImVtYWlsIjoiYWJjZEBhYmMuYWJjIiwicmFuZCI6OTgyMjcsImlhdCI6MTYyMjMwNjYyOSwiZXhwIjoxNjIyMzEzODI5fQ.DCMiFHkBG31_vLx4JGLwxuHs3GdCHa48xd_zVJ7WJQU
+
+{
+  "assets": "[]",
+  "components": "[]",
+  "css": "* { box-sizing: border-box; } body {margin: 0;}",
+  "html": "",
+  "styles": "[]"
+}

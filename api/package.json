@@ -20,10 +20,10 @@
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
-    "dotenv": "^9.0.2",
+    "dotenv": "^10.0.0",
     "express": "^4.17.1",
     "jsonwebtoken": "^8.5.1",
-    "mongoose": "^5.12.9",
+    "mongoose": "^5.12.12",
     "passport": "^0.4.1",
     "passport-facebook-token": "^4.0.0",
     "passport-google-verify-token": "^2.0.0",
@@ -32,7 +32,7 @@
     "passport-refresh-token": "^0.0.1"
   },
   "devDependencies": {
-    "eslint": "^7.26.0",
+    "eslint": "^7.27.0",
     "eslint-config-prettier": "^8.3.0",
     "eslint-plugin-prettier": "^3.4.0",
     "nodemon": "^2.0.7",

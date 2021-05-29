@@ -49,6 +49,23 @@ export const dropDownItems = {
       store.commit(SET_SHOWED_DROPDOWN, { isShowed: false });
     },
   },
+  editorSave: {
+    key: 'editorSave',
+    title: 'Save your website',
+    priority: 8,
+  },
+  editor: {
+    key: 'editor',
+    title: 'Edit your website',
+    priority: 9,
+    callback: async () => {
+      const { default: router } = await import('../router');
+      const { default: store } = await import('.');
+
+      router.push('/editor');
+      store.commit(SET_SHOWED_DROPDOWN, { isShowed: false });
+    },
+  },
 };
 
 const navigationModule = {
@@ -92,7 +109,7 @@ const navigationModule = {
           }
         }
 
-        newList.sort((a, b) => a.priority > b.priority);
+        newList.sort((a, b) => a.priority - b.priority);
         state.dropdownMenu = newList;
       }
     },

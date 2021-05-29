@@ -91,7 +91,12 @@ const authModule = {
       commit(REMOVE_FROM_DROPDOWN, {
         keys: [dropDownItems.login.key, dropDownItems.register.key],
       });
-      commit(ADD_TO_DROPDOWN, { items: [{ key: dropDownItems.logout.key }] });
+      commit(ADD_TO_DROPDOWN, {
+        items: [
+          { key: dropDownItems.editor.key },
+          { key: dropDownItems.logout.key },
+        ],
+      });
     },
     [REGISTER]: async (
       { commit, dispatch, state },
@@ -186,7 +191,12 @@ const authModule = {
         commit(REMOVE_FROM_DROPDOWN, {
           keys: [dropDownItems.login.key, dropDownItems.register.key],
         });
-        commit(ADD_TO_DROPDOWN, { items: [{ key: dropDownItems.logout.key }] });
+        commit(ADD_TO_DROPDOWN, {
+          items: [
+            { key: dropDownItems.editor.key },
+            { key: dropDownItems.logout.key },
+          ],
+        });
       } catch (error) {
         dispatch(POP_UP_ERROR, { error: error.message });
       }
@@ -233,7 +243,7 @@ const authModule = {
       dispatch(POP_UP_MESSAGE, { message: 'Logout successfully' });
 
       commit(REMOVE_FROM_DROPDOWN, {
-        keys: [dropDownItems.logout.key],
+        keys: [dropDownItems.logout.key, dropDownItems.editor.key],
       });
       commit(ADD_TO_DROPDOWN, {
         items: [

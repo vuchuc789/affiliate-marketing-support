@@ -26,6 +26,18 @@ import 'grapesjs/dist/css/grapes.min.css';
 import Navigator from '../components/Navigator.vue';
 import Notification from '../components/Notification.vue';
 import grapesjs from 'grapesjs';
+import {
+  ADD_TO_DROPDOWN,
+  REMOVE_FROM_DROPDOWN,
+  SET_SHOWED_DROPDOWN,
+} from '../store/mutation-types';
+import { dropDownItems } from '../store/navigation';
+import { POP_UP_ERROR, POP_UP_MESSAGE } from '../store/action-types';
+import { mapState } from 'vuex';
+
+const host = process.env.VUE_APP_API_URI;
+const storedEndpoint = `${host}/api/page/store`;
+const loadedEndpoint = `${host}/api/page/load`;
 
 export default {
   name: 'Editor',
@@ -35,13 +47,15 @@ export default {
       editor: null,
     };
   },
+  computed: mapState({
+    token: (state) => state.auth.accessToken,
+  }),
   mounted: function () {
     this.editor = grapesjs.init({
       container: '#gjs',
       fromElement: true,
       // height: 'calc(100% - 50px)',
       width: 'auto',
-      storageManager: false,
       layerManager: {
         appendTo: '.layers-container',
       },
@@ -94,14 +108,14 @@ export default {
             buttons: [
               {
                 id: 'device-desktop',
-                label: 'D',
+                label: '🖥️',
                 command: 'set-device-desktop',
                 active: true,
                 togglable: false,
               },
               {
                 id: 'device-mobile',
-                label: 'M',
+                label: '📱',
                 command: 'set-device-mobile',
                 togglable: false,
               },
@@ -203,6 +217,16 @@ export default {
           },
         ],
       },
+      storageManager: {
+        type: 'remote',
+        id: '',
+        autosave: false,
+        urlStore: storedEndpoint,
+        urlLoad: loadedEndpoint,
+        headers: {
+          Authorization: `Bearer ${this.token}`,
+        },
+      },
     });
 
     this.editor.Panels.addPanel({
@@ -301,6 +325,37 @@ export default {
 
     this.editor.Commands.add('set-device-mobile', {
       run: (editor) => editor.setDevice('Mobile'),
+    });
+
+    this.$store.commit(ADD_TO_DROPDOWN, {
+      items: [
+        {
+          key: dropDownItems.editorSave.key,
+          callback: () => {
+            this.editor.store((res) => {
+              const { message, success } = res;
+              console.log(res);
+              if (success) {
+                this.$store.dispatch(POP_UP_MESSAGE, {
+                  message: message || 'Stored successfully',
+                });
+                return;
+              }
+
+              this.$store.dispatch(POP_UP_ERROR, {
+                error: message || 'Stored failure',
+              });
+            });
+
+            this.$store.commit(SET_SHOWED_DROPDOWN, { isShow: false });
+          },
+        },
+      ],
+    });
+  },
+  beforeUnmount: function () {
+    this.$store.commit(REMOVE_FROM_DROPDOWN, {
+      keys: [dropDownItems.editorSave.key],
     });
   },
 };
