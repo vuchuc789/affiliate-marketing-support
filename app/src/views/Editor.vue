@@ -7,9 +7,7 @@
       <div class="panel__switcher"></div>
     </div>
     <div class="editor-row">
-      <div class="editor-canvas">
-        <div id="gjs"></div>
-      </div>
+      <div class="editor-canvas"><div id="gjs"></div></div>
       <div class="panel__right">
         <div class="layers-container"></div>
         <div class="styles-container"></div>
@@ -50,6 +48,30 @@ export default {
   computed: mapState({
     token: (state) => state.auth.accessToken,
   }),
+  created: function () {
+    const { editorSave, publish } = dropDownItems;
+
+    editorSave.callback = () => {
+      this.editor.store((res) => {
+        const { message, success } = res;
+
+        if (success) {
+          this.$store.dispatch(POP_UP_MESSAGE, {
+            message: message || 'Stored successfully',
+          });
+          return;
+        }
+
+        this.$store.dispatch(POP_UP_ERROR, {
+          error: message || 'Stored failure',
+        });
+      });
+
+      this.$store.commit(SET_SHOWED_DROPDOWN, { isShow: false });
+    };
+
+    this.$store.commit(ADD_TO_DROPDOWN, { items: [editorSave, publish] });
+  },
   mounted: function () {
     this.editor = grapesjs.init({
       container: '#gjs',
@@ -326,36 +348,11 @@ export default {
     this.editor.Commands.add('set-device-mobile', {
       run: (editor) => editor.setDevice('Mobile'),
     });
-
-    this.$store.commit(ADD_TO_DROPDOWN, {
-      items: [
-        {
-          key: dropDownItems.editorSave.key,
-          callback: () => {
-            this.editor.store((res) => {
-              const { message, success } = res;
-              console.log(res);
-              if (success) {
-                this.$store.dispatch(POP_UP_MESSAGE, {
-                  message: message || 'Stored successfully',
-                });
-                return;
-              }
-
-              this.$store.dispatch(POP_UP_ERROR, {
-                error: message || 'Stored failure',
-              });
-            });
-
-            this.$store.commit(SET_SHOWED_DROPDOWN, { isShow: false });
-          },
-        },
-      ],
-    });
   },
   beforeUnmount: function () {
+    const { editorSave, publish } = dropDownItems;
     this.$store.commit(REMOVE_FROM_DROPDOWN, {
-      keys: [dropDownItems.editorSave.key],
+      items: [editorSave, publish],
     });
   },
 };

@@ -28,6 +28,7 @@
 import { LOGIN, REGISTER } from '../store/action-types';
 import Navigator from '../components/Navigator.vue';
 import Notification from '../components/Notification.vue';
+import { mapGetters } from 'vuex';
 
 export default {
   name: 'Auth',
@@ -46,11 +47,7 @@ export default {
       formType: this.type,
     };
   },
-  computed: {
-    isAuthenticated: function () {
-      return this.$store.getters.isAuthenticated();
-    },
-  },
+  computed: mapGetters(['isAuthenticated']),
   watch: {
     isAuthenticated: function (newState) {
       if (newState) {

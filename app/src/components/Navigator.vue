@@ -2,6 +2,11 @@
   <div class="navbar">
     <router-link to="/" class="nav-logo">Logo</router-link>
     <a class="drop-btn" @click="onDropdownButtonClick"></a>
+    <div
+      class="drop-mask"
+      :class="{ 'drop-hide': !isShowed }"
+      @click="onDropdownButtonClick"
+    ></div>
     <div class="drop-menu" :class="{ 'drop-hide': !isShowed }">
       <a
         v-for="{ key, title, callback } in dropdownMenu"
@@ -14,18 +19,50 @@
 </template>
 
 <script>
-import { mapState } from 'vuex';
-import { SET_SHOWED_DROPDOWN } from '../store/mutation-types';
+import { mapState, mapGetters, mapMutations } from 'vuex';
+import {
+  SET_SHOWED_DROPDOWN,
+  ADD_TO_DROPDOWN,
+  REMOVE_FROM_DROPDOWN,
+} from '../store/mutation-types';
+import { dropDownItems } from '../store/navigation';
 
 export default {
   name: 'Navigator',
-  computed: mapState({
-    isShowed: (state) => state.navigation.isShowed,
-    dropdownMenu: (state) => state.navigation.dropdownMenu,
-  }),
+  computed: {
+    ...mapState({
+      isShowed: (state) => state.navigation.isShowed,
+      dropdownMenu: (state) => state.navigation.dropdownMenu,
+    }),
+    ...mapGetters(['isAuthenticated']),
+  },
   methods: {
     onDropdownButtonClick: function () {
       this.$store.commit(SET_SHOWED_DROPDOWN, { isShowed: !this.isShowed });
+    },
+    ...mapMutations({
+      addToDropdown: ADD_TO_DROPDOWN,
+      removeFromDropdown: REMOVE_FROM_DROPDOWN,
+    }),
+  },
+  watch: {
+    isAuthenticated: function (newAuthenticatedState) {
+      const { login, register, editor, logout, preview } = dropDownItems;
+      if (newAuthenticatedState) {
+        this.removeFromDropdown({
+          items: [login, register],
+        });
+        this.addToDropdown({
+          items: [editor, logout, preview],
+        });
+      } else {
+        this.removeFromDropdown({
+          items: [editor, logout, preview],
+        });
+        this.addToDropdown({
+          items: [login, register],
+        });
+      }
     },
   },
 };
@@ -112,5 +149,13 @@ export default {
 
 .drop-menu > a:not(:last-child) {
   border-bottom: 1px solid #3c2f2f;
+}
+
+.drop-mask {
+  position: absolute;
+  top: var(--nav-height);
+  left: 0;
+  width: 100vw;
+  height: calc(100vw - var(--nav-height));
 }
 </style>

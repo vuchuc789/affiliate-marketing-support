@@ -1,3 +1,5 @@
+import store from '../store';
+
 const host = process.env.VUE_APP_API_URI;
 
 export const jsonPost = async (url, requestPayload) => {
@@ -7,6 +9,39 @@ export const jsonPost = async (url, requestPayload) => {
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(requestPayload),
+  });
+
+  const data = await response.json();
+
+  return data;
+};
+
+export const jsonAuthGet = async (url) => {
+  const token = store?.state?.auth?.accessToken;
+
+  if (!token) {
+    return { message: 'You are not authenticated' };
+  }
+
+  const response = await fetch(host + url, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  const data = await response.json();
+
+  return data;
+};
+
+export const jsonGet = async (url) => {
+  const response = await fetch(host + url, {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    },
   });
 
   const data = await response.json();

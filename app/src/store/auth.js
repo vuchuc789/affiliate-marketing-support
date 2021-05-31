@@ -3,8 +3,6 @@ import {
   SET_ACCESS_TOKEN,
   SET_REFRESH_INTERVAL_ID,
   SET_REFRESH_TOKEN,
-  ADD_TO_DROPDOWN,
-  REMOVE_FROM_DROPDOWN,
 } from './mutation-types';
 import {
   GET_FROM_LOCAL_STORAGE,
@@ -17,7 +15,6 @@ import {
   REGISTER,
 } from './action-types';
 import { register, login, refreshAccessToken } from '../api/auth';
-import { dropDownItems } from './navigation';
 
 const refreshFailureTimeout = 60 * 1000;
 const refreshTokenInterval = 60 * 60 * 1000;
@@ -30,8 +27,7 @@ const authModule = {
     isAuthenticating: false,
   },
   getters: {
-    isAuthenticated: (state) => () =>
-      !!state.accessToken && !!state.refreshToken,
+    isAuthenticated: (state) => !!state.accessToken && !!state.refreshToken,
   },
   mutations: {
     [SET_ACCESS_TOKEN]: (state, { accessToken }) => {
@@ -87,16 +83,6 @@ const authModule = {
       dispatch(PERIODICALLY_REFRESH_TOKEN);
 
       commit(SET_AUTHENTICATING, { isAuthenticating: false });
-
-      commit(REMOVE_FROM_DROPDOWN, {
-        keys: [dropDownItems.login.key, dropDownItems.register.key],
-      });
-      commit(ADD_TO_DROPDOWN, {
-        items: [
-          { key: dropDownItems.editor.key },
-          { key: dropDownItems.logout.key },
-        ],
-      });
     },
     [REGISTER]: async (
       { commit, dispatch, state },
@@ -119,11 +105,13 @@ const authModule = {
           typeof rePassword !== 'string'
         ) {
           dispatch(POP_UP_ERROR, { error: 'Wrong input type' });
+          commit(SET_AUTHENTICATING, { isAuthenticating: false });
           return;
         }
 
         if (password !== rePassword) {
           dispatch(POP_UP_ERROR, { error: 'Password not matched' });
+          commit(SET_AUTHENTICATING, { isAuthenticating: false });
           return;
         }
 
@@ -131,6 +119,7 @@ const authModule = {
 
         if (!userId) {
           dispatch(POP_UP_ERROR, { error: message || 'Register failure' });
+          commit(SET_AUTHENTICATING, { isAuthenticating: false });
           return;
         }
 
@@ -163,6 +152,7 @@ const authModule = {
 
         if (typeof email !== 'string' || typeof password !== 'string') {
           dispatch(POP_UP_ERROR, { error: 'Wrong input type' });
+          commit(SET_AUTHENTICATING, { isAuthenticating: false });
           return;
         }
 
@@ -174,6 +164,7 @@ const authModule = {
 
         if (!accessToken || !refreshToken) {
           dispatch(POP_UP_ERROR, { error: message || 'Something went wrong' });
+          commit(SET_AUTHENTICATING, { isAuthenticating: false });
           return;
         }
 
@@ -187,16 +178,6 @@ const authModule = {
 
         commit(SET_AUTHENTICATING, { isAuthenticating: false });
         dispatch(POP_UP_MESSAGE, { message: message || 'Login successfully' });
-
-        commit(REMOVE_FROM_DROPDOWN, {
-          keys: [dropDownItems.login.key, dropDownItems.register.key],
-        });
-        commit(ADD_TO_DROPDOWN, {
-          items: [
-            { key: dropDownItems.editor.key },
-            { key: dropDownItems.logout.key },
-          ],
-        });
       } catch (error) {
         dispatch(POP_UP_ERROR, { error: error.message });
       }
@@ -242,15 +223,6 @@ const authModule = {
 
       dispatch(POP_UP_MESSAGE, { message: 'Logout successfully' });
 
-      commit(REMOVE_FROM_DROPDOWN, {
-        keys: [dropDownItems.logout.key, dropDownItems.editor.key],
-      });
-      commit(ADD_TO_DROPDOWN, {
-        items: [
-          { key: dropDownItems.login.key },
-          { key: dropDownItems.register.key },
-        ],
-      });
       if (typeof callback === 'function') {
         callback();
       }

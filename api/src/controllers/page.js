@@ -1,4 +1,5 @@
 const Page = require('../models/page');
+const PublishedPage = require('../models/publishedPage');
 
 const defaultPage = {
   assets: '[]',
@@ -16,13 +17,9 @@ const storePage = async (req, res) => {
     }
 
     const { id: userId } = req.user;
-    const {
-      assets = defaultPage.assets,
-      components = defaultPage.components,
-      css = defaultPage.css,
-      html = defaultPage.html,
-      styles = defaultPage.styles,
-    } = req.body;
+    const { assets, components, css, html, styles } = req.body;
+
+    console.log(req.body);
 
     let page = await Page.findOne({ userId });
 
@@ -83,7 +80,72 @@ const loadPage = async (req, res) => {
   }
 };
 
+const publishPage = async (req, res) => {
+  try {
+    if (!req.user || !req.user.id) {
+      res.json({ message: 'You are not authenticated' });
+      return;
+    }
+
+    const { id: userId } = req.user;
+
+    const page = await Page.findOne({ userId });
+
+    if (!page) {
+      res.json({ message: 'Page not found' });
+      return;
+    }
+
+    let publishedPage = await PublishedPage.findOne({ userId });
+
+    if (!publishedPage) {
+      publishedPage = new PublishedPage({ userId });
+    }
+
+    const { html = defaultPage.html, css = defaultPage.css } = page;
+
+    publishedPage.html = html;
+    publishedPage.css = css;
+
+    await publishedPage.save();
+
+    res.json({ message: 'Published successfully', success: true });
+  } catch (e) {
+    res.json({ message: 'Something went wrong' });
+  }
+};
+
+const getPage = async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    if (!userId) {
+      res.json({ message: 'Missing user id' });
+      return;
+    }
+
+    const publishedPage = await PublishedPage.findOne({ userId });
+
+    if (!publishedPage) {
+      res.json({ message: 'Page not found' });
+      return;
+    }
+
+    const { css = defaultPage.css, html = defaultPage.html } = publishedPage;
+
+    res.json({
+      css,
+      html,
+      message: 'Got successfully',
+    });
+  } catch (e) {
+    res.json({ message: 'Something went wrong' });
+  }
+};
+
 module.exports = {
   storePage,
   loadPage,
+  getPage,
+  publishPage,
 };

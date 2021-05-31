@@ -1,5 +1,3 @@
-// import { LOGOUT } from './action-types';
-
 const {
   SET_SHOWED_DROPDOWN,
   ADD_TO_DROPDOWN,
@@ -8,7 +6,6 @@ const {
 
 export const dropDownItems = {
   login: {
-    key: 'login',
     title: 'Login',
     priority: 10,
     callback: async () => {
@@ -20,7 +17,6 @@ export const dropDownItems = {
     },
   },
   register: {
-    key: 'register',
     title: 'Register',
     priority: 11,
     callback: async () => {
@@ -32,7 +28,6 @@ export const dropDownItems = {
     },
   },
   logout: {
-    key: 'logout',
     title: 'Logout',
     priority: 12,
     callback: async () => {
@@ -50,12 +45,10 @@ export const dropDownItems = {
     },
   },
   editorSave: {
-    key: 'editorSave',
     title: 'Save your website',
     priority: 8,
   },
   editor: {
-    key: 'editor',
     title: 'Edit your website',
     priority: 9,
     callback: async () => {
@@ -64,6 +57,41 @@ export const dropDownItems = {
 
       router.push('/editor');
       store.commit(SET_SHOWED_DROPDOWN, { isShowed: false });
+    },
+  },
+  preview: {
+    title: 'View your website',
+    priority: 7,
+    callback: async () => {
+      const { default: router } = await import('../router');
+      const { default: store } = await import('.');
+
+      router.push('/preview');
+      store.commit(SET_SHOWED_DROPDOWN, { isShowed: false });
+    },
+  },
+  publish: {
+    title: 'Publish your website',
+    priority: 6,
+    callback: async () => {
+      const { default: store } = await import('.');
+      const { POP_UP_ERROR, POP_UP_MESSAGE } = await import('./action-types');
+      const { publishPage } = await import('../api/page');
+
+      const result = await publishPage();
+
+      store.commit(SET_SHOWED_DROPDOWN, { isShowed: false });
+
+      if (!result.success) {
+        store.dispatch(POP_UP_ERROR, {
+          message: result.message || 'Something went wrong',
+        });
+        return;
+      }
+
+      store.dispatch(POP_UP_MESSAGE, {
+        message: result.message || 'Published successfully',
+      });
     },
   },
 };
@@ -87,48 +115,30 @@ const navigationModule = {
         return;
       }
 
-      const newList = [...state.dropdownMenu];
+      const newMenu = [...state.dropdownMenu];
 
-      for (let item of items) {
-        if (
-          typeof item === 'object' &&
-          typeof item.key === 'string' &&
-          typeof dropDownItems[item.key] === 'object'
-        ) {
-          let index = state.dropdownMenu.findIndex(
-            (element) => element.key === item.key
-          );
-
-          if (index === -1) {
-            newList.push(dropDownItems[item.key]);
-            index = newList.length - 1;
+      for (const item of items) {
+        if (!newMenu.find((val) => val.title === item.title)) {
+          if (!item.priority) {
+            item.priority = 0;
           }
 
-          if (typeof item.callback === 'function') {
-            newList[index].callback = item.callback;
-          }
+          newMenu.push(item);
         }
-
-        newList.sort((a, b) => a.priority - b.priority);
-        state.dropdownMenu = newList;
       }
+
+      newMenu.sort((a, b) => a.priority - b.priority);
+      state.dropdownMenu = newMenu;
     },
-    [REMOVE_FROM_DROPDOWN]: (state, { keys }) => {
-      if (!Array.isArray(keys)) {
+    [REMOVE_FROM_DROPDOWN]: (state, { items }) => {
+      if (!Array.isArray(items)) {
         return;
       }
 
-      const newList = [...state.dropdownMenu];
-
-      for (let key of keys) {
-        const index = newList.findIndex((element) => element.key === key);
-
-        if (index >= 0) {
-          newList.splice(index, 1);
-        }
-      }
-
-      state.dropdownMenu = newList;
+      const newMenu = state.dropdownMenu.filter(
+        (val1) => !items.find((val2) => val1.title === val2.title)
+      );
+      state.dropdownMenu = newMenu;
     },
   },
 };

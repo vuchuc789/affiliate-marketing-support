@@ -2,17 +2,11 @@ const mongoose = require('mongoose');
 
 const { Schema, model } = mongoose;
 
-const pageSchema = new Schema({
+const publishedPageSchema = new Schema({
   userId: {
     type: String,
     required: true,
     alias: 'user_id',
-  },
-  assets: {
-    type: String,
-  },
-  components: {
-    type: String,
   },
   css: {
     type: String,
@@ -20,9 +14,6 @@ const pageSchema = new Schema({
   html: {
     type: String,
   },
-  styles: {
-    type: String,
-  },
 });
 
-module.exports = model('pages', pageSchema);
+module.exports = model('published_pages', publishedPageSchema);

@@ -20,6 +20,8 @@
   },
   "homepage": "https://github.com/vuchuc789/affiliate-marketing-support#readme",
   "devDependencies": {
-    "concurrently": "^6.2.0"
+    "concurrently": "^6.2.0",
+    "eslint": "^7.28.0",
+    "eslint-plugin-vue": "^7.10.0"
   }
 }

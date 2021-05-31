@@ -2,6 +2,8 @@ import { createRouter, createWebHistory } from 'vue-router';
 import Home from '../views/Home.vue';
 import Auth from '../views/Auth.vue';
 import Editor from '../views/Editor.vue';
+import Preview from '../views/Preview.vue';
+import Store from '../views/Store.vue';
 
 import store from '../store/index';
 import { SET_SHOWED_DROPDOWN } from '../store/mutation-types';
@@ -25,6 +27,16 @@ const routes = [
     component: Editor,
   },
   {
+    path: '/preview',
+    name: 'Preview',
+    component: Preview,
+  },
+  {
+    path: '/store/:userId',
+    name: 'Store',
+    component: Store,
+  },
+  {
     path: '/',
     name: 'Home',
     component: Home,
@@ -37,10 +49,10 @@ const router = createRouter({
 });
 
 router.beforeEach((to, from, next) => {
-  const authGuard = ['Editor'];
+  const authGuard = ['Editor', 'Preview'];
   const noAuthGuard = ['Login', 'Register'];
 
-  if (store.getters.isAuthenticated()) {
+  if (store.getters.isAuthenticated) {
     if (noAuthGuard.includes(to.name)) {
       next({ name: 'Home' });
       return;

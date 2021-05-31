@@ -15,5 +15,11 @@ router.get(
   passport.authenticate('jwt', { session: false }),
   pageController.loadPage
 );
+router.get(
+  '/publish',
+  passport.authenticate('jwt', { session: false }),
+  pageController.publishPage
+);
+router.get('/:userId', pageController.getPage);
 
 module.exports = router;
