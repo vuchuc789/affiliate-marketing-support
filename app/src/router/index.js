@@ -4,6 +4,7 @@ import Auth from '../views/Auth.vue';
 import Editor from '../views/Editor.vue';
 import Preview from '../views/Preview.vue';
 import Store from '../views/Store.vue';
+import Dashboard from '../views/Dashboard.vue';
 
 import store from '../store/index';
 import { SET_SHOWED_DROPDOWN } from '../store/mutation-types';
@@ -37,6 +38,11 @@ const routes = [
     component: Store,
   },
   {
+    path: '/dashboard',
+    name: 'Dashboard',
+    component: Dashboard,
+  },
+  {
     path: '/',
     name: 'Home',
     component: Home,
@@ -49,7 +55,7 @@ const router = createRouter({
 });
 
 router.beforeEach((to, from, next) => {
-  const authGuard = ['Editor', 'Preview'];
+  const authGuard = ['Editor', 'Preview', 'Dashboard'];
   const noAuthGuard = ['Login', 'Register'];
 
   if (store.getters.isAuthenticated) {

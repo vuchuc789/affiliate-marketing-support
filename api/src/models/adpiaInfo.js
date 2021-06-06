@@ -10,8 +10,13 @@ const adpiaInfoSchema = new Schema({
   },
   adpiaId: {
     type: String,
-    required: true,
     alias: 'adpia_id',
+    default: '',
+  },
+  couponApi: {
+    type: String,
+    alias: 'coupon_api',
+    default: '',
   },
 });
 

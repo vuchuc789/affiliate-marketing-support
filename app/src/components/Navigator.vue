@@ -47,17 +47,18 @@ export default {
   },
   watch: {
     isAuthenticated: function (newAuthenticatedState) {
-      const { login, register, editor, logout, preview } = dropDownItems;
+      const { login, register, editor, logout, preview, dashboard } =
+        dropDownItems;
       if (newAuthenticatedState) {
         this.removeFromDropdown({
           items: [login, register],
         });
         this.addToDropdown({
-          items: [editor, logout, preview],
+          items: [editor, logout, preview, dashboard],
         });
       } else {
         this.removeFromDropdown({
-          items: [editor, logout, preview],
+          items: [editor, logout, preview, dashboard],
         });
         this.addToDropdown({
           items: [login, register],

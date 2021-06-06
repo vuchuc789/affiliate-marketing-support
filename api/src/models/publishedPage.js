@@ -10,9 +10,11 @@ const publishedPageSchema = new Schema({
   },
   css: {
     type: String,
+    default: '',
   },
   html: {
     type: String,
+    default: '',
   },
 });
 

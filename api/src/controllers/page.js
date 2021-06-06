@@ -19,8 +19,6 @@ const storePage = async (req, res) => {
     const { id: userId } = req.user;
     const { assets, components, css, html, styles } = req.body;
 
-    console.log(req.body);
-
     let page = await Page.findOne({ userId });
 
     if (!page) {

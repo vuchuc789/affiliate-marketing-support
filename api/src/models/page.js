@@ -10,18 +10,23 @@ const pageSchema = new Schema({
   },
   assets: {
     type: String,
+    default: '',
   },
   components: {
     type: String,
+    default: '',
   },
   css: {
     type: String,
+    default: '',
   },
   html: {
     type: String,
+    default: '',
   },
   styles: {
     type: String,
+    default: '',
   },
 });
 

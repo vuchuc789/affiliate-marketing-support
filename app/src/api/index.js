@@ -26,7 +26,6 @@ export const jsonAuthGet = async (url) => {
   const response = await fetch(host + url, {
     method: 'GET',
     headers: {
-      'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
     },
   });
@@ -39,9 +38,37 @@ export const jsonAuthGet = async (url) => {
 export const jsonGet = async (url) => {
   const response = await fetch(host + url, {
     method: 'GET',
+  });
+
+  const data = await response.json();
+
+  return data;
+};
+
+export const jsonAuthPost = async (url, requestPayload) => {
+  const token = store?.state?.auth?.accessToken;
+
+  if (!token) {
+    return { message: 'You are not authenticated' };
+  }
+
+  const response = await fetch(host + url, {
+    method: 'POST',
     headers: {
       'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
     },
+    body: JSON.stringify(requestPayload),
+  });
+
+  const data = await response.json();
+
+  return data;
+};
+
+export const jsonGetV2 = async (uri) => {
+  const response = await fetch(uri, {
+    method: 'GET',
   });
 
   const data = await response.json();

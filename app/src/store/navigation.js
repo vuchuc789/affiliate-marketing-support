@@ -29,7 +29,7 @@ export const dropDownItems = {
   },
   logout: {
     title: 'Logout',
-    priority: 12,
+    priority: 13,
     callback: async () => {
       const { default: store } = await import('.');
       const { LOGOUT } = await import('./action-types');
@@ -92,6 +92,17 @@ export const dropDownItems = {
       store.dispatch(POP_UP_MESSAGE, {
         message: result.message || 'Published successfully',
       });
+    },
+  },
+  dashboard: {
+    title: 'Dashboard',
+    priority: 12,
+    callback: async () => {
+      const { default: router } = await import('../router');
+      const { default: store } = await import('.');
+
+      router.push('/dashboard');
+      store.commit(SET_SHOWED_DROPDOWN, { isShowed: false });
     },
   },
 };
