@@ -32,6 +32,7 @@ mongoose.connect(mongoUri, mongoOptions, (err) => {
 });
 
 app.use(cors(corsOptions));
+app.use(express.urlencoded({ extended: true }));
 app.use(express.json({ limit: '50mb' }));
 // handle JSON syntax error
 app.use((error, req, res, next) => {

@@ -28,6 +28,7 @@ export default {
   justify-content: flex-start;
   align-items: center;
   text-align: center;
+  z-index: 100;
 }
 
 .notification > div {

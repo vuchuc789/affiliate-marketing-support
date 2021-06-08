@@ -10,6 +10,7 @@
   "dependencies": {
     "core-js": "^3.14.0",
     "grapesjs": "^0.17.4",
+    "grapesjs-preset-newsletter": "^0.2.21",
     "vue": "^3.0.0",
     "vue-router": "^4.0.0-0",
     "vuex": "^4.0.0-0"
