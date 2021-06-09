@@ -1,4 +1,4 @@
-import { jsonAuthGet, jsonAuthPost, jsonGetV2 } from '.';
+import { jsonAuthGet, jsonAuthPost } from '.';
 
 export const getAdpiaInfo = async () => {
   const url = '/api/adpia/get';
@@ -9,14 +9,14 @@ export const getAdpiaInfo = async () => {
 
 export const setAdpiaInfo = async (adpiaInfo) => {
   const url = '/api/adpia/set';
-
   const result = jsonAuthPost(url, adpiaInfo);
 
   return result;
 };
 
-export const getCoupons = async (uri) => {
-  const coupons = await jsonGetV2(uri);
+export const getCoupons = async () => {
+  const url = '/api/adpia/coupons';
+  const coupons = await jsonAuthGet(url);
 
   return coupons;
 };

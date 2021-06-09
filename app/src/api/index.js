@@ -65,13 +65,3 @@ export const jsonAuthPost = async (url, requestPayload) => {
 
   return data;
 };
-
-export const jsonGetV2 = async (uri) => {
-  const response = await fetch(uri, {
-    method: 'GET',
-  });
-
-  const data = await response.json();
-
-  return data;
-};

@@ -10,7 +10,9 @@ const linkPreview = async (req, res) => {
 
     const data = await getLinkPreview(url, {
       headers: {
-        'user-agent': 'Googlebot',
+        // 'user-agent': 'Googlebot',
+        'user-agent':
+          'facebookexternalhit/1.1 (+http://www.facebook.com/externalhit_uatext.php)',
       },
     });
 

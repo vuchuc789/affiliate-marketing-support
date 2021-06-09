@@ -15,5 +15,10 @@ router.post(
   passport.authenticate('jwt', { session: false }),
   adpiaController.setInfo
 );
+router.get(
+  '/coupons',
+  passport.authenticate('jwt', { session: false }),
+  adpiaController.getCoupons
+);
 
 module.exports = router;

@@ -1,3 +1,4 @@
+const { default: axios } = require('axios');
 const AdpiaInfo = require('../models/adpiaInfo');
 
 const getInfo = async (req, res) => {
@@ -60,7 +61,38 @@ const setInfo = async (req, res) => {
   }
 };
 
+const getCoupons = async (req, res) => {
+  try {
+    if (!req.user || !req.user.id) {
+      res.json('You are not authenticated');
+      return;
+    }
+
+    const { id: userId } = req.user;
+    const adpiaInfo = await AdpiaInfo.findOne({ userId });
+
+    if (!adpiaInfo) {
+      res.json({ message: 'Your adpia information is not exists' });
+      return;
+    }
+
+    const { couponApi } = adpiaInfo;
+
+    const { data } = await axios.get(couponApi);
+
+    if (!data) {
+      res.json({ message: 'Something went wrong' });
+      return;
+    }
+
+    res.json(data);
+  } catch (e) {
+    res.json({ message: 'Something went wrong' });
+  }
+};
+
 module.exports = {
   getInfo,
   setInfo,
+  getCoupons,
 };

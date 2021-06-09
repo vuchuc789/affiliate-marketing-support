@@ -126,45 +126,6 @@ export default {
         if (!newVal?.couponApi) {
           return;
         }
-
-        const { data } = await getCoupons(newVal.couponApi);
-
-        if (!data || !Array.isArray(data.items)) {
-          this.popupError({ error: 'Fail to load coupons' });
-          return;
-        }
-
-        const coupons = [];
-
-        for (const item of data.items) {
-          const {
-            AFF_LINK: affLink,
-            CATEGORY_NAME: categoryName,
-            DESCRIPTION: description,
-            DEVICE: device,
-            DISCOUNT: discount,
-            DISCOUNT_CODE: code,
-            END_DATE: endDate,
-            MERCHANT_ID: merchantId,
-            QUANTITY: quantity,
-            START_DATE: startDate,
-          } = item;
-
-          coupons.push({
-            affLink,
-            categoryName,
-            description,
-            device,
-            discount,
-            code,
-            endDate,
-            merchantId,
-            quantity,
-            startDate,
-          });
-        }
-
-        this.coupons = coupons;
       },
       deep: true,
     },
@@ -191,9 +152,48 @@ export default {
 
       if (!adpiaId && !couponApi) {
         this.popupError({ error: adpiaMessage || 'Adpia info not found' });
-      } else {
-        this.adpiaInfo = { adpiaId, couponApi };
+        return;
       }
+      this.adpiaInfo = { adpiaId, couponApi };
+
+      const { data } = await getCoupons();
+
+      if (!data || !Array.isArray(data.items)) {
+        this.popupError({ error: 'Fail to load coupons' });
+        return;
+      }
+
+      const coupons = [];
+
+      for (const item of data.items) {
+        const {
+          AFF_LINK: affLink,
+          CATEGORY_NAME: categoryName,
+          DESCRIPTION: description,
+          DEVICE: device,
+          DISCOUNT: discount,
+          DISCOUNT_CODE: code,
+          END_DATE: endDate,
+          MERCHANT_ID: merchantId,
+          QUANTITY: quantity,
+          START_DATE: startDate,
+        } = item;
+
+        coupons.push({
+          affLink,
+          categoryName,
+          description,
+          device,
+          discount,
+          code,
+          endDate,
+          merchantId,
+          quantity,
+          startDate,
+        });
+      }
+
+      this.coupons = coupons;
     } catch (e) {
       this.popupError({ error: e.message });
     }
